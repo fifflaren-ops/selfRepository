@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="css/bootstrap-table/bootstrap-table.min.css">
+    <link rel="stylesheet" href="css/bootstrap-validator/bootstrapValidator.min.css">
+</head>
+<body>
+<div class="container">
+
+    <span class="row">&nbsp;&nbsp;</span>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMember">
+        新增人员
+    </button>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+        批量删除
+    </button>
+    <table id="doctorTable" data-show-refresh="true"></table>
+</div>
+<div class="modal fade" id="addMember">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">增加人员</h6>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form id="addForm">
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="username">用户名:</label>
+                    <input type="text" class="form-control" name="username" id="username" placeholder="请输入用户名">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="realname">真实姓名:</label>
+                    <input type="text" class="form-control" name="realname" id="realname" placeholder="请输入姓名">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="password">密码:</label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="age">年龄:</label>
+                    <input type="text" class="form-control" name="age" id="age" placeholder="请输入年龄">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label>性别:</label>
+                    <label><input type="radio" name="gender" value="男">男</label>
+                    <label><input type="radio" name="gender" value="女">女</label>
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="phone">电话:</label>
+                    <input type="text" class="form-control" name="phone" id="phone" placeholder="请输入电话号码">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="joinDate">加入日期:</label>
+                    <input type="date" class="form-control" name="joinDate" id="joinDate">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="parentDepartmentNum">请选择父级科室</label>
+                    <select class="form-control" id="parentDepartmentNum" name="parentDepartmentNum">
+                    </select>
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="departmentNum">请选择科室</label>
+                    <select class="form-control" id="departmentNum" name="departmentNum">
+                    	<option>请选择科室</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="dutyNum">请选择职务</label>
+                    <select class="form-control" id="dutyNum" name="dutyNum">
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary" style="margin-left: 10px;margin-right: 10px;margin-bottom: 10px" onclick="addMember()">增加</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="js/bootstrap/bootstrap.min.js"></script>
+<script src="js/bootstrap-table/bootstrap-table.min.js" ></script>
+<script src="js/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+<script src="js/bootstrap-validator/bootstrapValidator.min.js" ></script>
+<script src="js/h-ui/H-ui.min.js"></script>
+<script src="js/h-ui/H-ui.admin.js"></script>
+<script src="js/layer/2.4/layer.js"></script>
+<script src="js/layerpage/1.2/laypage.js"></script>
+
+<script>
+    $(function(){
+        $('#doctorTable').bootstrapTable({
+            url:'http://localhost:8080/clinic/member/list',
+            method:"post",
+            toolbar: "#toolbar",
+            pagination:true,
+            search:true,
+            pageNumber:1,
+            pageSize:5,
+            pageList : [ 5, 10, 20, 30 ],
+            sidePagination:"server",
+            columns: [
+                { checkbox: true},
+                {field: 'id',title: '编号'},
+                {field: 'realname',title: '姓名'},
+                {field: 'gender',title: '性别'},
+                {field: 'age',title: '年龄'},
+                {field: 'phone',title: '电话'},
+                {field: 'departmentName',title: '科室'},
+                {field: 'joinDate',title: '加入时间'},
+                {
+                    field:'id',
+                    title:'操作',
+                    align:'center',
+                    formatter:operationFormatter
+                }
+                ],
+            responseHandler: function(res) {
+                var data =  {rows: res.list,total: res.total};
+                return data;
+            },
+            queryParams: function(params) {
+                return{
+                    "pageNum":params.offset / params.limit +1,
+                    "pageSize":params.limit,
+                    "keyword":params.search
+                }
+            }
+        })
+        $('#addForm').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields:{
+                username:{
+                    message:'用户名验证失败',
+                    threshold:5,
+                    validators:{
+                        notEmpty:{
+                            message:"用户名不能为空"
+                        },
+                        stringLength:{
+                            min:6,
+                            max:18,
+                            message:"用户名由6到18位英文组成"
+                        },
+                        regexp: {
+                            regexp: /^[a-zA-Z]+$/,
+                            message: '用户名只能由英文组成，大小写均可'
+                        },
+                        remote:{
+                            url:"http://localhost:8080/clinic/member/checkusername",
+                            message:"用户名已存在",
+                            delay:2000,
+                            type:'post',
+                            data:function(){
+                                return {username:$('#username').val()}
+                            }
+                        }
+                    }
+                },
+                realname:{
+                    message:'真实姓名验证失败',
+                    threshold:1,
+                    validators:{
+                        notEmpty:{
+                            message:'姓名不能为空'
+                        },
+                        regexp: {
+                            regexp: /^[\u4e00-\u9fa5]+$/,
+                            message: '真实姓名只能是中文'
+                        },
+                        stringLength:{
+                            min:2,
+                            max:4,
+                            message:"姓名由2到4个中文组成"
+                        }
+                    }
+                },
+                password:{
+                    threshold:5,
+                    validators:{
+                        notEmpty:{
+                            message:"密码不能为空"
+                        },
+                        stringLength:{
+                            min:6,
+                            max:18,
+                            message:'密码长度为6到18位之间'
+                        },
+                        regexp:{
+                            regexp:/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]+$/,
+                            message:"密码必须是英文和数字的组合"
+                        }
+                    }
+                },
+                age:{
+                    validators:{
+                        notEmpty:{
+                            message:'年龄不能为空'
+                        },
+                        regexp:{
+                            regexp:/^(?:[1-9][0-9]?|1[01][0-9]|120)$/,
+                            message:"年龄必须是数字且范围在1到120"
+                        }
+                    }
+                },
+                gender:{
+                    validators:{
+                        notEmpty:{
+                            message:"性别必选"
+                        }
+                    }
+                },
+                phone:{
+                    validators:{
+                        notEmpty:{
+                            message:"电话号码不能为空"
+                        },
+                        regexp:{
+                            regexp:/[1][3456789][0-9]{9}$/,
+                            message:"请输入正确的电话号码"
+                        }
+                    }
+                },
+                joinDate:{
+                    validators:{
+                        notEmpty:{
+                            message:"加入日期不能为空"
+                        }
+                    }
+                }
+            }
+        })
+        $("button[name='refresh']").children("i").removeClass("fa");
+        $("button[name='refresh']").children("i").removeClass("fa-sync");
+        var refreshHtml="";
+        refreshHtml+="<svg class='bi bi-arrow-counterclockwise' width='1em' height='1em' viewBox='0 0 16 16' fill='currentColor' xmlns='http://www.w3.org/2000/svg'>";
+        refreshHtml+="<path fill-rule='evenodd' d='M12.83 6.706a5 5 0 00-7.103-3.16.5.5 0 11-.454-.892A6 6 0 112.545 5.5a.5.5 0 11.91.417 5 5 0 109.375.789z' clip-rule='evenodd'/>";
+        refreshHtml+="<path fill-rule='evenodd' d='M7.854.146a.5.5 0 00-.708 0l-2.5 2.5a.5.5 0 000 .708l2.5 2.5a.5.5 0 10.708-.708L5.707 3 7.854.854a.5.5 0 000-.708z' clip-rule='evenodd'/>";
+        refreshHtml+="</svg>";
+        $("button[name='refresh']").html(refreshHtml);
+    })
+    $("#parentDepartmentNum").one('click',getParentDepartmentsList());
+    $("#departmentNum").one('click',getDepartmentList());
+    $("#dutyNum").one('click',getDutiesList());
+    jQuery.prototype.serializeObject=function(){
+        var obj=new Object();
+        $.each(this.serializeArray(),function(index,param){
+            if(!(param.name in obj)){
+                obj[param.name]=param.value;
+            }
+        });
+        return obj;
+    };
+    function getParentDepartmentsList(){
+        $.ajax({
+            url:'http://localhost:8080/clinic/department/parentList',
+            type:'post',
+            success:function(data){
+                var html="<option>请选择父级科室</option>";
+                for(var i =0;i<data.length;i++){
+                    html+="<option value="+data[i].id+">"+data[i].id+"."+data[i].departmentName+"</option>"
+                }
+                $("#parentDepartmentNum").html(html);
+            }
+        })
+    }
+    function getDepartmentList(){
+    	var parentDepartmentNum = $("#parentDepartmentNum");
+		parentDepartmentNum.on('change',function(){
+			var parentId = $("#parentDepartmentNum").val();
+			$.ajax({
+				url:"http://localhost:8080/clinic/department/departmentList/"+parentId,
+				type:"get",
+				success:function(data){
+					var html = "";
+					for(var i =0;i<data.length;i++){
+	                    html+="<option value="+data[i].id+">"+data[i].id+"."+data[i].departmentName+"</option>"
+	                }
+					$("#departmentNum").html(html);
+				}
+			})
+		})
+    }
+    function getDutiesList(){
+        $.ajax({
+            url:'http://localhost:8080/clinic/duty/list',
+            type:'post',
+            success:function(data){
+                var html="";
+                for(var i =0;i<data.length;i++){
+                    html+="<option value="+data[i].id+">"+data[i].id+"."+data[i].dutyName+"</option>"
+                }
+                $("#dutyNum").html(html);
+            }
+        })
+    }
+    function operationFormatter(value,row,index) {
+        var html="";
+        html+="<span onclick='memberEdit("+value+")' style='cursor:pointer'><svg class='bi bi-pencil' width='1em' height='1em' viewBox='0 0 16 16' fill='currentColor' xmlns='http://www.w3.org/2000/svg'>";
+        html+="<path fill-rule='evenodd' d='M11.293 1.293a1 1 0 011.414 0l2 2a1 1 0 010 1.414l-9 9a1 1 0 01-.39.242l-3 1a1 1 0 01-1.266-1.265l1-3a1 1 0 01.242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z' clip-rule='evenodd'/>";
+        html+="<path fill-rule='evenodd' d='M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 00.5.5H4v.5a.5.5 0 00.5.5H5v.5a.5.5 0 00.5.5H6v-1.5a.5.5 0 00-.5-.5H5v-.5a.5.5 0 00-.5-.5H3z' clip-rule='evenodd'/>";
+        html+="</svg>";
+        html+="</span>&nbsp;&nbsp;&nbsp";
+        html+="<span onclick='memberDel("+value+")' style='cursor:pointer' class='glyphicon glyphicon-trash'><svg class='bi bi-trash' width='1em' height='1em' viewBox='0 0 16 16' fill='currentColor' xmlns='http://www.w3.org/2000/svg'>";
+        html+="<path d='M5.5 5.5A.5.5 0 016 6v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm2.5 0a.5.5 0 01.5.5v6a.5.5 0 01-1 0V6a.5.5 0 01.5-.5zm3 .5a.5.5 0 00-1 0v6a.5.5 0 001 0V6z'/>";
+        html+="<path fill-rule='evenodd' d='M14.5 3a1 1 0 01-1 1H13v9a2 2 0 01-2 2H5a2 2 0 01-2-2V4h-.5a1 1 0 01-1-1V2a1 1 0 011-1H6a1 1 0 011-1h2a1 1 0 011 1h3.5a1 1 0 011 1v1zM4.118 4L4 4.059V13a1 1 0 001 1h6a1 1 0 001-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z' clip-rule='evenodd'/>";
+        html+="</svg></span>";
+        return html;
+    }
+    function memberEdit(value){
+    	layer_show("编辑人员","http://localhost:8080/clinic/editMember/"+value,"800","500");
+    }
+    function memberDel(value){
+    	layer.open({
+    		title:'确认删除id为'+value+'的人员？',
+    		btn:['确认删除','取消删除'],
+    		yes:function(index,layero){
+    			$.ajax({
+    				url:"http://localhost:8080/clinic/member/delmember/"+value,
+    				type:'get',
+    				date:value,
+    				success:function(data){
+    					if(data==1){
+        					layer.closeAll();
+        					location.reload();
+    					}
+    				}
+    			})
+    		}
+    	})
+    }
+    function addMember(){
+        $("#addForm").data('bootstrapValidator').validate();
+        var flag = $("#addForm").data('bootstrapValidator').isValid();
+        if(flag==true){
+            var formInformation = $("#addForm").serializeObject();
+            var data = JSON.stringify(formInformation);
+            console.log(data);
+            $.ajax({
+                url:"http://localhost:8080/clinic/member/addmember",
+                type:"post",
+                dataType:'json',
+                contentType:'application/json',
+                data:data,
+                success:function(data){
+                    if(data==1){
+                        location.reload();
+                    }
+                }
+            })
+        }
+    }
+</script>
+</html>

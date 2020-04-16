@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <style>
+        html{
+            width: 100%;
+            height: 100%;
+            padding: 0px;
+            margin: 0px;
+        }
+        body{
+            width: 100%;
+            height: 100%;
+            padding: 0px;
+            margin: 0px;
+        }
+        .customization{
+            height: 100%;
+            width: 100%;
+            background-image: url(images/timg.jpg);
+            background-size: 120% 120%;
+            box-shadow: 0px 0px 10px white inset
+        }
+    </style>
+</head>
+<body>
+<div class="customization">
+    <div class="row" style="height: 10%;width: 100%">
+    </div>
+    <div class="row" style="height: 80%;width: 80%;margin: auto;">
+        <div class="col" style="height: 100%;width: 50%;background-color: green;border-bottom-left-radius: 5px;border-top-left-radius: 5px;opacity: 0.8">
+            <div style="height: 35%;width: 100%;"></div>
+            <div class="align-content-center" style="height: 45%;width: 100%;">
+                <h1 style="color:white">欢迎登录</h1>
+                <span style="font-size: smaller;color: white">明医诊所管理系统</span>
+            </div>
+            <div style="height: 20%;width: 100%;"></div>
+        </div>
+        <div class="col" style="height: 100%;width: 50%;border-bottom-right-radius: 5px;border-top-right-radius: 5px;background-color: white;opacity: 0.8">
+            <div style="position: absolute;left: 5%;top: 30%;width: 90%">
+                <form>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="username" id="username" placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码">
+                    </div>
+                    <div class="form-group">
+                        <input type="button" value="登录" class="btn btn-primary">
+                    </div>
+                    <span style="font-size: smaller">没有账号？</span>
+                    <span style="font-size: smaller"><a href="">注册</a></span>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="height: 10%;width: 100%"></div>
+</div>
+</body>
+<script src="js/jquery.min.js" rel="script"/></script>
+<script src="js/bootstrap/bootstrap.min.js" rel="script"/></script>
+</html>

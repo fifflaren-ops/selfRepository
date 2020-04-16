@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.jj.mapper.MemberMapper">
+  <resultMap id="Member" type="cn.jj.pojo.Member">
+    <result column="id" jdbcType="INTEGER" property="id"/>
+    <result column="realname" jdbcType="VARCHAR" property="realname"/>
+    <result column="username" jdbcType="VARCHAR" property="username"/>
+    <result column="password" jdbcType="VARCHAR" property="password"/>
+    <result column="gender" jdbcType="VARCHAR" property="gender"/>
+    <result column="age" jdbcType="INTEGER" property="age"/>
+    <result column="phone" jdbcType="VARCHAR" property="phone"/>
+    <result column="parent_id" jdbcType="INTEGER" property="parentDepartmentNum"/>
+    <result column="department_num" jdbcType="INTEGER" property="departmentNum"/>
+    <result column="join_date" jdbcType="DATE" property="joinDate"/>
+    <result column="department_name" jdbcType="VARCHAR" property="departmentName"/>
+    <result column="duty_num" jdbcType="VARCHAR" property="dutyNum"/>
+  </resultMap>
+  <select id="memberList" resultMap="Member">
+  	SELECT m.id,username,realname,gender,age,phone,join_date,dp.department_name
+	FROM member m
+	LEFT OUTER JOIN department dp
+	on m.department_num = dp.id
+	<if test="keyword!=''">
+		WHERE 
+		m.realname like "%"#{keyword}"%" 
+	</if>
+	order by m.id
+  </select>
+  <select id="checkMemberUsername" resultMap="Member">
+  	SELECT id,username,realname,gender,age,phone,join_date
+	FROM member 
+	WHERE username=#{username}
+  </select>
+  <select id="checkMemberRealname" resultMap="Member">
+  	SELECT id,username,realname,gender,age,phone,join_date
+	FROM member 
+	WHERE realname=#{realname}
+  </select>
+  <insert id="addMember" parameterType="cn.jj.pojo.Member" useGeneratedKeys="true">
+  	insert INTO member (username,realname,gender,age,phone,department_num,join_date,duty_num,password) 
+	VALUES (#{member.username},#{member.realname},#{member.gender},#{member.age},#{member.phone},#{member.departmentNum},#{member.joinDate},#{member.dutyNum},#{member.password})
+  </insert>
+  <select id="getMemberById" resultMap="Member" parameterType="java.lang.Integer">
+  	SELECT m.id,realname,username,password,gender,age,phone,department_num,join_date,duty_num,d.parent_id
+	FROM member m 
+	LEFT JOIN department d
+	on m.department_num = d.id
+	WHERE m.id = #{id}
+  </select>
+  <update id="editMember" parameterType="cn.jj.pojo.Member">
+  	UPDATE member m
+	SET m.realname = #{member.realname},m.password=#{member.password},m.age=#{member.age},m.gender=#{member.gender},m.phone=#{member.phone},m.join_date=#{member.joinDate},m.department_num=#{member.departmentNum},m.duty_num=#{member.dutyNum} 
+	WHERE m.id = #{member.id}
+  </update>
+  <delete id="delMemberById" parameterType="java.lang.Integer">
+  	DELETE 
+  	FROM member 
+  	WHERE id=#{id}
+  </delete>
+</mapper>

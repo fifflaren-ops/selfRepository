@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.jj.mapper.DepartmentMapper">
+  <resultMap id="Department" type="cn.jj.pojo.Department">
+    <result column="id" jdbcType="INTEGER" property="id"/>
+    <result column="department_name" jdbcType="VARCHAR" property="departmentName"/>
+    <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+  </resultMap>
+  <select id="parentDepartmentsList" resultMap="Department">
+  	SELECT id,department_name,parent_id
+	FROM department
+	WHERE parent_id=0 
+  </select>
+  <select id="getDepartmentsListByParentId" resultMap="Department">
+  	SELECT id,department_name,parent_id
+	FROM department
+	WHERE parent_id=#{parentId} 
+  </select>
+  <select id="checkDepartmentByName" resultMap="Department">
+  	SELECT id,department_name,parent_id
+	FROM department
+	WHERE department_name=#{departmentName}
+  </select>
+  <insert id="addDepartment" parameterType="cn.jj.pojo.Department" useGeneratedKeys="true">
+  	insert INTO department (department_name,parent_id) 
+	VALUES (#{department.departmentName},#{department.parentId})
+  </insert>
+  <select id="getDepartmentById" resultMap="Department">
+  	SELECT id,department_name,parent_id
+	FROM department
+	WHERE id=#{id}
+  </select>
+  <update id="editDepartment" parameterType="cn.jj.pojo.Department">
+  	UPDATE department d
+	SET d.department_name=#{department.departmentName},d.parent_id=#{department.parentId}
+	WHERE d.id = #{department.id}
+  </update>
+  <delete id="delDepartmentById" parameterType="java.lang.Integer">
+  	DELETE 
+  	FROM department 
+  	WHERE id=#{id}
+  </delete>
+</mapper>

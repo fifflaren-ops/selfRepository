@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="http://localhost:8080/clinic/css/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="http://localhost:8080/clinic/css/bootstrap-table/bootstrap-table.min.css">
+    <link rel="stylesheet" href="http://localhost:8080/clinic/css/bootstrap-validator/bootstrapValidator.min.css">
+</head>
+<body>
+            <form id="editForm">
+            	<div class="form-group" style="margin-left: 10px;margin-right: 10px" hidden="hidden">
+                    <label for="id">id:</label>
+                    <input type="text" class="form-control" th:value="${department.id}" name="id" id="id">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="parentId">请选择父级科室</label>
+                    <select class="form-control" id="parentId" name="parentId">
+                    	<option>请选择父级科室</option>
+                    	<option th:selected="${department.parentId eq parentDepartment.id}" th:each="parentDepartment:${parentDepartmentsList}" th:value="${parentDepartment.id}" th:text="${parentDepartment.id}+'.'+${parentDepartment.departmentName}"></option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="departmentName">科室名称:</label>
+                    <input type="text" class="form-control" name="departmentName" id="departmentName" th:value="${department.departmentName}">
+                </div>
+                <button type="button" class="btn btn-primary" style="margin-left: 10px;margin-right: 10px;margin-bottom: 10px" onclick="edditDepartment()">保存</button>
+            </form>
+</body>
+<script src="http://localhost:8080/clinic/js/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="http://localhost:8080/clinic/js/bootstrap/bootstrap.min.js"></script>
+<script src="http://localhost:8080/clinic/js/bootstrap-table/bootstrap-table.min.js" ></script>
+<script src="http://localhost:8080/clinic/js/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+<script src="http://localhost:8080/clinic/js/bootstrap-validator/bootstrapValidator.min.js" ></script>
+<script src="http://localhost:8080/clinic/js/h-ui/H-ui.min.js"></script>
+<script src="http://localhost:8080/clinic/js/h-ui/H-ui.admin.js"></script>
+<script src="http://localhost:8080/clinic/js/layer/2.4/layer.js"></script>
+<script src="http://localhost:8080/clinic/js/layerpage/1.2/laypage.js"></script>
+<script>
+$('#editForm').bootstrapValidator({
+    fields:{
+    	parentId:{
+			validators:{
+				notEmpty:{
+					message:"父级科室不能为空"
+				}
+			}
+		},
+		departmentName:{
+			validators:{
+				notEmpty:{
+					message:"科室名称不能为空"
+				},
+				regexp: {
+                    regexp: /^[\u4e00-\u9fa5]+$/,
+                    message: "科室名称只能是中文"
+                },
+                remote:{
+                	url:"http://localhost:8080/clinic/department/checkdepartmentname",
+                	message:"该科室已存在",
+                	delay:2000,
+                	type:"post",
+                	data:function(){
+                		return {departmentname:$("#departmentName").val()}
+                	}
+                }
+			}
+		}
+    }      
+});
+jQuery.prototype.serializeObject=function(){
+    var obj=new Object();
+    $.each(this.serializeArray(),function(index,param){
+        if(!(param.name in obj)){
+            obj[param.name]=param.value;
+        }
+    });
+    return obj;
+};
+function edditDepartment(){
+    $("#editForm").data('bootstrapValidator').validate();
+    var flag = $("#editForm").data('bootstrapValidator').isValid();
+    if(flag==true){
+        var formInformation = $("#editForm").serializeObject();
+        var data = JSON.stringify(formInformation);
+        $.ajax({
+            url:"http://localhost:8080/clinic/department/editdepartment",
+            type:"post",
+            dataType:'json',
+            contentType:'application/json',
+            data:data,
+            success:function(data){
+                if(data==1){
+                	layer.closeAll();
+					alert('修改成功');
+					location.reload();
+                }
+				if(data==0){
+					layer_show("未对原有数据进行修改","800","500");
+				}
+            }
+        })
+    }
+};
+</script>
+</html>

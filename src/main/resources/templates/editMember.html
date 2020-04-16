@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="http://localhost:8080/clinic/css/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="http://localhost:8080/clinic/css/bootstrap-table/bootstrap-table.min.css">
+    <link rel="stylesheet" href="http://localhost:8080/clinic/css/bootstrap-validator/bootstrapValidator.min.css">
+</head>
+<body>
+			<input hidden="hidden" type="text" th:value="${member.joinDate}" id = "time">
+            <form id="editForm">
+            	
+            	<div class="form-group" style="margin-left: 10px;margin-right: 10px" hidden="hidden">
+                    <label for="id">id:</label>
+                    <input type="text" class="form-control" th:value="${member.id}" name="id" id="id">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="username">用户名:</label>
+                    <input type="text" class="form-control" th:value="${member.username}" name="username" id="username" placeholder="请输入用户名" readonly="readonly">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="realname">真实姓名:</label>
+                    <input type="text" class="form-control" th:value="${member.realname}" name="realname" id="realname" placeholder="请输入姓名">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="password">密码:</label>
+                    <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="repassword">再次输入密码:</label>
+                    <input type="password" class="form-control" name="repassword" id="repassword" placeholder="请再次输入密码">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="age">年龄:</label>
+                    <input type="text" class="form-control" th:value="${member.age}" name="age" id="age" placeholder="请输入年龄">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label>性别:</label>
+                    <label><input type="radio" name="gender" value="男" th:attr="checked=${member.gender == '男'?true:false}">男</label>
+                    <label><input type="radio" name="gender" value="女" th:attr="checked=${member.gender == '女'?true:false}">女</label>
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="phone">电话:</label>
+                    <input type="text" class="form-control" th:value="${member.phone}" name="phone" id="phone" placeholder="请输入电话号码">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="joinDate">加入日期:</label>
+                    <input type="date" class="form-control" name="joinDate" id="joinDate">
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="parentDepartmentNum">请选择父级科室</label>
+                    <select class="form-control" id="parentDepartmentNum" name="parentDepartmentNum">
+                    	<option>请选择父级科室</option>
+                    	<option th:selected="${member.parentDepartmentNum eq parentDepartment.id}" th:each="parentDepartment:${parentDepartmentsList}" th:value="${parentDepartment.id}" th:text="${parentDepartment.id}+'.'+${parentDepartment.departmentName}"></option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="departmentNum">请选择科室</label>
+                    <select class="form-control" id="departmentNum" name="departmentNum">
+                    	<option>请选择科室</option>
+                    	<option th:selected="${member.departmentNum eq department.id}" th:each="department:${departmentsList}" th:value="${department.id}" th:text="${department.id}+'.'+${department.departmentName}"></option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-left: 10px;margin-right: 10px">
+                    <label for="dutyNum">请选择职务</label>
+                    <select class="form-control" id="dutyNum" name="dutyNum">
+                    	<option th:selected="${member.dutyNum eq duty.id}" th:each="duty:${dutiesList}" th:value="${duty.id}" th:text="${duty.id}+'.'+${duty.dutyName}"></option>
+                    </select>
+                </div>
+                <button type="button" class="btn btn-primary" style="margin-left: 10px;margin-right: 10px;margin-bottom: 10px" onclick="edditMember()">保存</button>
+            </form>
+</body>
+<script src="http://localhost:8080/clinic/js/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="http://localhost:8080/clinic/js/bootstrap/bootstrap.min.js"></script>
+<script src="http://localhost:8080/clinic/js/bootstrap-table/bootstrap-table.min.js" ></script>
+<script src="http://localhost:8080/clinic/js/bootstrap-table/bootstrap-table-zh-CN.min.js"></script>
+<script src="http://localhost:8080/clinic/js/bootstrap-validator/bootstrapValidator.min.js" ></script>
+<script src="http://localhost:8080/clinic/js/h-ui/H-ui.min.js"></script>
+<script src="http://localhost:8080/clinic/js/h-ui/H-ui.admin.js"></script>
+<script src="http://localhost:8080/clinic/js/layer/2.4/layer.js"></script>
+<script src="http://localhost:8080/clinic/js/layerpage/1.2/laypage.js"></script>
+<script>
+$(function(){
+	joinDateFormat();
+})
+$('#editForm').bootstrapValidator({
+    feedbackIcons: {
+        valid: 'glyphicon glyphicon-ok',
+        invalid: 'glyphicon glyphicon-remove',
+        validating: 'glyphicon glyphicon-refresh'
+    },
+    fields:{
+        realname:{
+            message:'真实姓名验证失败',
+            threshold:1,
+            validators:{
+                notEmpty:{
+                    message:'姓名不能为空'
+                },
+                regexp: {
+                    regexp: /^[\u4e00-\u9fa5]+$/,
+                    message: '真实姓名只能是中文'
+                },
+                stringLength:{
+                    min:2,
+                    max:4,
+                    message:"姓名由2到4个中文组成"
+                }
+            }
+        },
+        password:{
+            threshold:5,
+            validators:{
+                notEmpty:{
+                    message:"密码不能为空"
+                },
+                stringLength:{
+                    min:6,
+                    max:18,
+                    message:'密码长度为6到18位之间'
+                },
+                regexp:{
+                    regexp:/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]+$/,
+                    message:"密码必须是英文和数字的组合"
+                }
+            }
+        },
+        repassword:{
+        	threshold:5,
+        	validators:{
+        		identical:{
+        			field:'password',
+        			message:'两次输入的密码必须一致'
+        		}
+        	}
+        },
+        age:{
+            validators:{
+                notEmpty:{
+                    message:'年龄不能为空'
+                },
+                regexp:{
+                    regexp:/^(?:[1-9][0-9]?|1[01][0-9]|120)$/,
+                    message:"年龄必须是数字且范围在1到120"
+                }
+            }
+        },
+        gender:{
+            validators:{
+                notEmpty:{
+                    message:"性别必选"
+                }
+            }
+        },
+        phone:{
+            validators:{
+                notEmpty:{
+                    message:"电话号码不能为空"
+                },
+                regexp:{
+                    regexp:/[1][3456789][0-9]{9}$/,
+                    message:"请输入正确的电话号码"
+                }
+            }
+        },
+        joinDate:{
+            validators:{
+                notEmpty:{
+                    message:"加入日期不能为空"
+                }
+            }
+        }
+    }
+});
+jQuery.prototype.serializeObject=function(){
+    var obj=new Object();
+    $.each(this.serializeArray(),function(index,param){
+        if(!(param.name in obj)){
+            obj[param.name]=param.value;
+        }
+    });
+    return obj;
+};
+function edditMember(){
+    $("#editForm").data('bootstrapValidator').validate();
+    var flag = $("#editForm").data('bootstrapValidator').isValid();
+    if(flag==true){
+        var formInformation = $("#editForm").serializeObject();
+        var data = JSON.stringify(formInformation);
+        console.log(data);
+        $.ajax({
+            url:"http://localhost:8080/clinic/member/editmember",
+            type:"post",
+            dataType:'json',
+            contentType:'application/json',
+            data:data,
+            success:function(data){
+                if(data==1){
+					layer.closeAll();
+					alert('修改成功');
+					location.reload();
+                }
+                if(data==0){
+                	layer_show("未对原有数据进行修改","800","500");
+                }
+            }
+        })
+    }
+};
+function joinDateFormat(){
+	var time = $("#time").val();
+	var date = new Date(time.toString());
+	var joinTime = date.getFullYear();
+	if((date.getMonth()+1)<10){
+		joinTime = joinTime + '-' +  '0' + (date.getMonth()+1);
+	}else{
+		joinTime = joinTime + '-' +  (date.getMonth()+1);
+	}
+	if(date.getDate()<10){
+		joinTime = joinTime + '-' +  '0' + date.getDate();
+	}else{
+		joinTime = joinTime + '-' +  date.getDate();
+	}
+	$("#joinDate").val(joinTime);
+}
+function getParentDepartmentsList(){
+    $.ajax({
+        url:'http://localhost:8080/clinic/department/parentList',
+        type:'post',
+        success:function(data){
+            var html="<option>请选择父级科室</option>";
+            for(var i =0;i<data.length;i++){
+                html+="<option value="+data[i].id+">"+data[i].id+"."+data[i].departmentName+"</option>"
+            }
+            $("#parentDepartmentNum").html(html);
+        }
+    })
+}
+function getDepartmentList(){
+	var parentDepartmentNum = $("#parentDepartmentNum");
+	parentDepartmentNum.on('change',function(){
+		var parentId = $("#parentDepartmentNum").val();
+		$.ajax({
+			url:"http://localhost:8080/clinic/department/departmentList/"+parentId,
+			type:"get",
+			success:function(data){
+				var html = "";
+				for(var i =0;i<data.length;i++){
+                    html+="<option value="+data[i].id+">"+data[i].id+"."+data[i].departmentName+"</option>"
+                }
+				$("#departmentNum").html(html);
+			}
+		})
+	})
+}
+$("#departmentNum").one('click',getDepartmentList());
+</script>
+</html>
