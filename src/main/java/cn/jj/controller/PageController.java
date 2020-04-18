@@ -31,7 +31,7 @@ public class PageController {
 	public String welcome() {
 		return "welcome";
 	}
-	@RequestMapping("login")
+	@RequestMapping("tologin")
 	public String login() {
 		return "login";
 	}

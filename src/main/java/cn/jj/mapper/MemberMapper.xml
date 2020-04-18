@@ -57,4 +57,10 @@
   	FROM member 
   	WHERE id=#{id}
   </delete>
+  <select id="login" resultMap="Member">
+  	select username,password
+  	from member
+  	where username = #{username} 
+  	and password = #{password}
+  </select>
 </mapper>
