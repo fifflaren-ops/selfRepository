@@ -10,8 +10,6 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.fasterxml.jackson.databind.module.SimpleAbstractTypeResolver;
-
 import cn.jj.pojo.Member;
 import cn.jj.service.MemberService;
 
@@ -39,7 +37,7 @@ public class MyRealm extends AuthorizingRealm{
 		if (member==null) {
 			return null;
 		}
-		return new SimpleAuthenticationInfo("",member.getPassword(),"");
+		return new SimpleAuthenticationInfo(member.getRealname(),member.getPassword(),this.getName());
 	}
 
 }

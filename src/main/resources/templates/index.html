@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh_CN" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
@@ -32,7 +33,7 @@
     <div class="dropdown">
         <span style="color: white">欢迎您，</span>
         <button class="btn btn-secondary dropdown-toggle btn-info" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <span id="username">用户名</span>
+            <shiro:principal></shiro:principal>
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <a class="dropdown-item" href="1" style="font-size: x-small">个人信息</a>

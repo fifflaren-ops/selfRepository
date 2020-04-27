@@ -58,7 +58,7 @@
   	WHERE id=#{id}
   </delete>
   <select id="login" resultMap="Member">
-  	select username,password
+  	select username,password,realname
   	from member
   	where username = #{username} 
   	and password = #{password}
