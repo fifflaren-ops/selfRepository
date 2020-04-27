@@ -41,7 +41,7 @@
         </div>
         <div class="col" style="height: 100%;width: 50%;border-bottom-right-radius: 5px;border-top-right-radius: 5px;background-color: white;opacity: 0.8">
             <div style="position: absolute;left: 5%;top: 30%;width: 90%">
-                <form>
+                <form action="http://localhost:8080/clinic/login" method="post">
                     <div class="form-group">
                         <input type="text" class="form-control" name="username" id="username" placeholder="请输入用户名">
                     </div>
@@ -49,10 +49,11 @@
                         <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码">
                     </div>
                     <div class="form-group">
-                        <input type="button" value="登录" class="btn btn-primary" onclick="login()">
+                        <input type="submit" value="登录" class="btn btn-primary">
                     </div>
                     <span style="font-size: smaller">没有账号？</span>
                     <span style="font-size: smaller"><a href="">注册</a></span>
+                    <span th:text=${msg}></span>
                 </form>
             </div>
         </div>

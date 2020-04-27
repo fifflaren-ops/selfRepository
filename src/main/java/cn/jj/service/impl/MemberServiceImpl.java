@@ -41,4 +41,8 @@ public class MemberServiceImpl implements MemberService{
 	public Integer addMember(Member member) {
 		return memberMapper.addMember(member);
 	}
+	@Override
+	public Member login(String username) {
+		return memberMapper.checkMemberUsername(username);
+	}
 }

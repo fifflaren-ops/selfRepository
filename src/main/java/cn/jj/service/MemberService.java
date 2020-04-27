@@ -12,4 +12,5 @@ public interface MemberService {
 	Member getMemberById(Integer id);
 	Integer editeMember(Member member);
 	Integer delMemberById(Integer id);
+	Member login(String username);
 }

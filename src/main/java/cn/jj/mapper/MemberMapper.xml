@@ -27,7 +27,7 @@
 	order by m.id
   </select>
   <select id="checkMemberUsername" resultMap="Member">
-  	SELECT id,username,realname,gender,age,phone,join_date
+  	SELECT id,username,realname,gender,age,phone,join_date,password
 	FROM member 
 	WHERE username=#{username}
   </select>

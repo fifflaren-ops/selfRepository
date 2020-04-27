@@ -17,6 +17,7 @@ public class ShiroConfiguration {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
 		shiroFilterFactoryBean.setLoginUrl("tologin");
+		shiroFilterFactoryBean.setSuccessUrl("index");
 		/**
 		 * anon 无需认证
 		 * authc 需要登录
@@ -26,8 +27,8 @@ public class ShiroConfiguration {
 		 */
 		Map<String, String> filterChainDefinitionMap = new LinkedHashMap<String, String>();
 		filterChainDefinitionMap.put("/tologin", "anon");
-		filterChainDefinitionMap.put("/user/login", "anon");
-		filterChainDefinitionMap.put("/*", "authc");
+		filterChainDefinitionMap.put("/login", "anon");
+		filterChainDefinitionMap.put("/**", "authc");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 		return shiroFilterFactoryBean;
 	}
