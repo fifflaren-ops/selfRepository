@@ -2,13 +2,18 @@ package cn.jj.pojo;
 
 
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class Member {
+public class Member implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer id;
 	private String username;
 	private String password;
@@ -23,6 +28,7 @@ public class Member {
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date joinDate;
 	private Integer dutyNum;
+	private Integer role;
 	public Integer getId() {
 		return id;
 	}
@@ -95,9 +101,18 @@ public class Member {
 	public void setDutyNum(Integer dutyNum) {
 		this.dutyNum = dutyNum;
 	}
+	public Integer getRole() {
+		return role;
+	}
+	public void setRole(Integer role) {
+		this.role = role;
+	}
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 	public Member(Integer id, String username, String password, String realname, String gender, Integer age,
 			String phone, Integer parentDepartmentNum, Integer departmentNum, String departmentName, Date joinDate,
-			Integer dutyNum) {
+			Integer dutyNum, Integer role) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -111,9 +126,11 @@ public class Member {
 		this.departmentName = departmentName;
 		this.joinDate = joinDate;
 		this.dutyNum = dutyNum;
+		this.role = role;
 	}
 	public Member() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
 }
