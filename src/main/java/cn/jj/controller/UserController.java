@@ -15,7 +15,6 @@ public class UserController {
 	@PostMapping
 	@RequestMapping("login")
 	public String login(String username,String password,Model model) {
-		System.out.println(username+password);
 		Subject subject = SecurityUtils.getSubject();
 		UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username,password);
 		try {

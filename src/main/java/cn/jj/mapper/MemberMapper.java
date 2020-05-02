@@ -15,5 +15,5 @@ public interface MemberMapper {
 	Member getMemberById(Integer id);
 	Integer editMember(@Param("member") Member member);
 	Integer delMemberById(Integer id);
-	Member login(@Param("username")String username,@Param("password")String password);
+	Member login(@Param("username")String username);
 }

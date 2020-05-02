@@ -14,6 +14,7 @@
     <result column="join_date" jdbcType="DATE" property="joinDate"/>
     <result column="department_name" jdbcType="VARCHAR" property="departmentName"/>
     <result column="duty_num" jdbcType="VARCHAR" property="dutyNum"/>
+    <result column="role" jdbcType="VARCHAR" property="role"/>
   </resultMap>
   <select id="memberList" resultMap="Member">
   	SELECT m.id,username,realname,gender,age,phone,join_date,dp.department_name
@@ -58,9 +59,8 @@
   	WHERE id=#{id}
   </delete>
   <select id="login" resultMap="Member">
-  	select username,password,realname
+  	select username,password,realname,role
   	from member
-  	where username = #{username} 
-  	and password = #{password}
+  	where username = #{username}
   </select>
 </mapper>

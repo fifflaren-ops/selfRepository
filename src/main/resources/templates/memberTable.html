@@ -12,12 +12,16 @@
 <div class="container">
 
     <span class="row">&nbsp;&nbsp;</span>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMember">
-        新增人员
-    </button>
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
-        批量删除
-    </button>
+    <shiro:hasPermission name="normal:list">
+	    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addMember">
+	        新增人员
+	    </button>
+    </shiro:hasPermission>
+    <shiro:hasPermission name="admin:add">
+	    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+	        批量删除
+	    </button>
+	</shiro:hasPermission>    
     <table id="doctorTable" data-show-refresh="true"></table>
 </div>
 <div class="modal fade" id="addMember">

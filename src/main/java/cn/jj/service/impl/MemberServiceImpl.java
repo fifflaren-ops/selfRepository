@@ -43,6 +43,6 @@ public class MemberServiceImpl implements MemberService{
 	}
 	@Override
 	public Member login(String username) {
-		return memberMapper.checkMemberUsername(username);
+		return memberMapper.login(username);
 	}
 }
