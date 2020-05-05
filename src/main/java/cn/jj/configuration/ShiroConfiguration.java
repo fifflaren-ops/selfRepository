@@ -3,6 +3,8 @@ package cn.jj.configuration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.servlet.Filter;
+
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -18,6 +20,9 @@ public class ShiroConfiguration {
 	public ShiroFilterFactoryBean getShiroFilterFactoryBean(@Qualifier(value = "defaultSecurityManager")SecurityManager securityManager) {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
 		shiroFilterFactoryBean.setSecurityManager(securityManager);
+		LinkedHashMap<String,Filter> filtersMap = new LinkedHashMap<String, Filter>();
+		filtersMap.put("logout", getMyShiroLogoutFilter());
+		shiroFilterFactoryBean.setFilters(filtersMap);
 		shiroFilterFactoryBean.setLoginUrl("tologin");
 		shiroFilterFactoryBean.setSuccessUrl("index");
 		/**
@@ -33,6 +38,7 @@ public class ShiroConfiguration {
 		filterChainDefinitionMap.put("/css/**", "anon");
 		filterChainDefinitionMap.put("/js/**", "anon");
 		filterChainDefinitionMap.put("/images/**", "anon");
+		filterChainDefinitionMap.put("/logout", "logout");
 		filterChainDefinitionMap.put("/**", "authc");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 		return shiroFilterFactoryBean;
@@ -47,8 +53,14 @@ public class ShiroConfiguration {
 	public MyRealm  getMyRealm() {
 		return new MyRealm();
 	}
+	public MyShiroLogoutFilter getMyShiroLogoutFilter() {
+		MyShiroLogoutFilter myShiroLogoutFilter = new MyShiroLogoutFilter();
+		myShiroLogoutFilter.setRedirectUrl("tologin");
+		return myShiroLogoutFilter;
+	}
 	@Bean
 	public ShiroDialect getShiroDialect() {
 		return new ShiroDialect();
 	}
+	
 }

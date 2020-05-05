@@ -1,7 +1,6 @@
 package cn.jj.configuration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.shiro.authc.AuthenticationException;
