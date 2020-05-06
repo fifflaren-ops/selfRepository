@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ public class MemberController {
 	private MemberService memberService;
 	@PostMapping
 	@RequestMapping(value = "list",consumes = "application/json")
+	@RequiresPermissions("normal:list")
 	public PageInfo<Member> doctorsList(@RequestBody Map<String, Object> map){
 		Integer pageNum = (Integer) map.get("pageNum");
 		Integer pageSize = (Integer) map.get("pageSize");
@@ -51,16 +53,19 @@ public class MemberController {
 	}
 	@PostMapping
 	@RequestMapping("addmember")
+	@RequiresPermissions("admin:add")
 	public Integer addMember(@RequestBody Member member) {
 		return memberService.addMember(member);
 	}
 	@PostMapping
 	@RequestMapping("editmember")
+	@RequiresPermissions("admin:update")
 	public Integer editMember(@RequestBody Member member) {
 		return memberService.editeMember(member);
 	}
 	@GetMapping
 	@RequestMapping("delmember/{id}")
+	@RequiresPermissions("admin:delete")
 	public Integer delMember(@PathVariable("id") Integer id) {
 		return memberService.delMemberById(id);
 	}

@@ -3,6 +3,7 @@ package cn.jj.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ public class DepartmentController {
 	private DepartmentService departmentService;
 	@PostMapping
 	@RequestMapping("parentList")
+	@RequiresPermissions("normal:list")
 	public List<Department> departmentsList(){
 		return departmentService.parentDepartmentsList();
 	}
@@ -41,16 +43,19 @@ public class DepartmentController {
 	}
 	@PostMapping
 	@RequestMapping("adddepartment")
+	@RequiresPermissions("admin:add")
 	public Integer addMember(@RequestBody Department department) {
 		return departmentService.addDepartment(department);
 	}
 	@PostMapping
 	@RequestMapping("editdepartment")
+	@RequiresPermissions("admin:update")
 	public Integer editDepartment(@RequestBody Department department) {
 		return departmentService.editDepartment(department);
 	}
 	@GetMapping
 	@RequestMapping("deldepartment/{id}")
+	@RequiresPermissions("admin:delete")
 	public Integer delMember(@PathVariable("id") Integer id) {
 		return departmentService.delDepartmentById(id);
 	}

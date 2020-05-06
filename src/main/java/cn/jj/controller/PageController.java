@@ -2,6 +2,8 @@ package cn.jj.controller;
 
 
 import java.util.List;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,15 +33,21 @@ public class PageController {
 	public String welcome() {
 		return "welcome";
 	}
+	@RequestMapping("unauthorized")
+	public String unauthorized() {
+		return "unauthorized";
+	}
 	@RequestMapping("tologin")
 	public String login() {
 		return "login";
 	}
 	@RequestMapping("memberTable")
+	@RequiresPermissions("normal:list")
 	public String memberTable() {
 		return "memberTable";
 	}
 	@RequestMapping("editMember/{id}")
+	@RequiresPermissions("admin:update")
 	public String editMember(@PathVariable(name = "id") Integer id,Model model) {
 		Member member = memberService.getMemberById(id);
 		List<Department> parentDepartmentsList = departmentService.parentDepartmentsList();
@@ -52,10 +60,12 @@ public class PageController {
 		return "editMember";
 	}
 	@RequestMapping("/departmenttable")
+	@RequiresPermissions("normal:list")
 	public String departmentTable() {
 		return "departmentTable";
 	}
 	@RequestMapping("editDepartment/{id}")
+	@RequiresPermissions("admin:update")
 	public String editDepartment(@PathVariable(name = "id")Integer id,Model model) {
 		Department department = departmentService.getDepartmentById(id);
 		List<Department> parentDepartmentsList = departmentService.parentDepartmentsList();
