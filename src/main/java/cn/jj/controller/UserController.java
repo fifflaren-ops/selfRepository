@@ -14,9 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class UserController {
 	@PostMapping
 	@RequestMapping("login")
-	public String login(String username,String password,Model model) {
+	public String login(String username,String password,Boolean rememberMe,Model model) {
 		Subject subject = SecurityUtils.getSubject();
 		UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username,password);
+		if (rememberMe == null) {
+			rememberMe = false;
+		}
+		usernamePasswordToken.setRememberMe(rememberMe);
 		try {
 			subject.login(usernamePasswordToken);
 		} catch (UnknownAccountException unknownAccountException) {

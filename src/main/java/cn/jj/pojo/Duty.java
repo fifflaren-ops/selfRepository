@@ -1,6 +1,12 @@
 package cn.jj.pojo;
 
-public class Duty {
+import java.io.Serializable;
+
+public class Duty implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer id;
 	private String dutyName;
 	public Integer getId() {

@@ -6,11 +6,15 @@ import java.util.Properties;
 
 import javax.servlet.Filter;
 
+import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -46,7 +50,7 @@ public class ShiroConfiguration {
 		filterChainDefinitionMap.put("/js/**", "anon");
 		filterChainDefinitionMap.put("/images/**", "anon");
 		filterChainDefinitionMap.put("/logout", "logout");
-		filterChainDefinitionMap.put("/**", "authc");
+		filterChainDefinitionMap.put("/**", "user");
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 		return shiroFilterFactoryBean;
 	}
@@ -54,6 +58,7 @@ public class ShiroConfiguration {
 	public SecurityManager getSecurityManager(@Qualifier(value = "myRealm")MyRealm myRealm) {
 		DefaultWebSecurityManager defaultSecurityManager = new DefaultWebSecurityManager();
 		defaultSecurityManager.setRealm(myRealm);
+		defaultSecurityManager.setRememberMeManager(rememberMeManager());
 		return defaultSecurityManager;
 	}
 	@Bean(name = "myRealm")
@@ -69,6 +74,10 @@ public class ShiroConfiguration {
 		myShiroLogoutFilter.setRedirectUrl("tologin");
 		return myShiroLogoutFilter;
 	}
+	/**
+	 * 配置shiro在thymeleaf中使用shiro标签
+	 * @return
+	 */
 	@Bean
 	public ShiroDialect getShiroDialect() {
 		return new ShiroDialect();
@@ -115,5 +124,31 @@ public class ShiroConfiguration {
 	    
 	    return simpleMappingExceptionResolver;
 	}
-	
+	/**
+	 * 表单认证过滤器，处理前段<input type='checkbox' name='rememberMe'/>
+	 */
+	@Bean
+	public FormAuthenticationFilter formAuthenticationFilter() {
+		FormAuthenticationFilter formAuthenticationFilter = new FormAuthenticationFilter();
+		formAuthenticationFilter.setRememberMeParam("rememberMe");
+		return formAuthenticationFilter;
+	}
+	/**
+	 * 
+	 */
+	@Bean
+	public CookieRememberMeManager rememberMeManager() {
+		CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
+		cookieRememberMeManager.setCookie(rememberMeCookie());
+		cookieRememberMeManager.setCipherKey(Base64.decode("4AvVhmFLUs0KTA3Kprsdag=="));
+		return cookieRememberMeManager;
+	}
+	@Bean
+	public SimpleCookie rememberMeCookie() {
+		SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
+		simpleCookie.setHttpOnly(true);
+		simpleCookie.setPath("/");
+		simpleCookie.setMaxAge(86400);
+		return simpleCookie;
+	}
 }

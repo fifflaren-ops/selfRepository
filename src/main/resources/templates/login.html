@@ -50,6 +50,9 @@
                         <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码">
                     </div>
                     <div class="form-group">
+                        <input type="checkbox" name="rememberMe" id="rememberMe">记住我
+                    </div>
+                    <div class="form-group">
                         <input type="submit" value="登录" class="btn btn-primary">
                     </div>
                     <span style="font-size: smaller">没有账号？</span>
@@ -65,10 +68,8 @@
 <script src="js/jquery.min.js"/></script>
 <script src="js/bootstrap/bootstrap.min.js"/></script>
 <script type="text/javascript">
-function login(){
-	var username = $("#username").val();
-	var password = $("#password").val();
-	$.post("user/login",{username:username,password:password});
+function check(){
+	alert($("#rememberMe").is(':checked'));
 }
 </script>
 </html>
