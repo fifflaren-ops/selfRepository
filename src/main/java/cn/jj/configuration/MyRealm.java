@@ -62,5 +62,41 @@ public class MyRealm extends AuthorizingRealm{
 		}
 		return new SimpleAuthenticationInfo(member,member.getPassword(),this.getName());
 	}
-
+	/**
+	 * 清除指定用户的缓存的认证信息
+	 */
+	public void clearCachedAuthenticationInfo(PrincipalCollection principals) {
+		super.clearCachedAuthenticationInfo(principals);
+	}
+	/**
+	 * 清除指定用户的缓存的授权信息
+	 */
+	public void clearCachedAuthorizationInfo(PrincipalCollection principals) {
+		super.clearCachedAuthorizationInfo(principals);
+	}
+	/**
+	 * 清除指定的用户的缓存的认证信息和授权信息
+	 */
+	public void clearCache(PrincipalCollection principals) {
+		super.clearCache(principals);
+	}
+	/**
+	 * 清除所有缓存的认证信息
+	 */
+	public void clearAllCachedAuthenticationInfo() {
+		getAuthenticationCache().clear();
+	}
+	/**
+	 * 清除所有缓存的授权信息
+	 */
+	public void clearAllCachedAuthorizationInfo() {
+		getAuthorizationCache().clear();
+	}
+	/**
+	 * 清楚所有缓存的认证信息和授权信息
+	 */
+	public void clearAllCache() {
+		clearAllCachedAuthenticationInfo();
+		clearAllCachedAuthorizationInfo();
+	}
 }

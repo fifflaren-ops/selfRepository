@@ -1,5 +1,6 @@
 package cn.jj.configuration;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -8,6 +9,12 @@ import javax.servlet.Filter;
 
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.session.SessionListener;
+import org.apache.shiro.session.mgt.SessionManager;
+import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
+import org.apache.shiro.session.mgt.eis.JavaUuidSessionIdGenerator;
+import org.apache.shiro.session.mgt.eis.SessionDAO;
+import org.apache.shiro.session.mgt.eis.SessionIdGenerator;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -15,8 +22,12 @@ import org.apache.shiro.web.filter.authc.FormAuthenticationFilter;
 import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.servlet.SimpleCookie;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
+import org.crazycake.shiro.RedisCacheManager;
+import org.crazycake.shiro.RedisManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.MethodInvokingFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
@@ -57,13 +68,26 @@ public class ShiroConfiguration {
 	@Bean(name = "defaultSecurityManager")
 	public SecurityManager getSecurityManager(@Qualifier(value = "myRealm")MyRealm myRealm) {
 		DefaultWebSecurityManager defaultSecurityManager = new DefaultWebSecurityManager();
+		//设置自定义授权认证
 		defaultSecurityManager.setRealm(myRealm);
+		//设置自定义记住我管理器
 		defaultSecurityManager.setRememberMeManager(rememberMeManager());
+		//设置缓存管理器用redis进行缓存处理
+		defaultSecurityManager.setCacheManager(cacheManager());
+		//设置session管理器
+		defaultSecurityManager.setSessionManager(sessionManager());
 		return defaultSecurityManager;
 	}
 	@Bean(name = "myRealm")
 	public MyRealm  getMyRealm() {
-		return new MyRealm();
+		MyRealm myRealm = new MyRealm();
+		//缓存realm信息
+		myRealm.setCachingEnabled(true);
+		//开启缓存权限信息的缓存
+		myRealm.setAuthorizationCachingEnabled(true);
+		//缓存的名字
+		myRealm.setAuthorizationCacheName("authorizationCache");
+		return myRealm;
 	}
 	@Bean(name = "lifecycleBeanPostProcessor")
 	public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
@@ -151,4 +175,107 @@ public class ShiroConfiguration {
 		simpleCookie.setMaxAge(86400);
 		return simpleCookie;
 	}
+	/**
+	 * 让某个实例的某个方法的返回值注入为Bean的实例
+	 * @param myRealm
+	 * @return
+	 */
+	@Bean
+	public MethodInvokingFactoryBean getMethodInvokingFactoryBean(@Qualifier("myRealm")MyRealm myRealm) {
+		MethodInvokingFactoryBean methodInvokingFactoryBean = new MethodInvokingFactoryBean();
+		methodInvokingFactoryBean.setStaticMethod("org.apache.shiro.SecurityUtils.setSecurityManager");
+		methodInvokingFactoryBean.setArguments(new Object[] {getSecurityManager(myRealm)});
+		return methodInvokingFactoryBean;
+	}
+	/**
+	 * 配置session监听
+	 * @return
+	 */
+	@Bean
+	public ShiroSessionListener shiroSessionListener() {
+		return new ShiroSessionListener();
+	}
+	/**
+	 * 配置sessionId生成器
+	 * @return
+	 */
+	@Bean
+	public SessionIdGenerator sessionIdGenerator() {
+		return new JavaUuidSessionIdGenerator();
+	}
+	/**
+	 *  SessionDAO的作用是为Session提供CRUD并进行持久化的一个shiro组件
+	 * MemorySessionDAO 直接在内存中进行会话维护
+	 * EnterpriseCacheSessionDAO  提供了缓存功能的会话维护，默认情况下使用MapCache实现，内部使用ConcurrentHashMap保存缓存的会话。
+	 * @return
+	 */
+	@Bean
+	public SessionDAO sessionDAO() {
+		EnterpriseCacheSessionDAO enterpriseCacheSessionDAO = new EnterpriseCacheSessionDAO();
+		//配置redis的缓存管理器
+		//enterpriseCacheSessionDAO.setCacheManager(cacheManager);
+		enterpriseCacheSessionDAO.setActiveSessionsCacheName("shiroSessionDao");
+		enterpriseCacheSessionDAO.setSessionIdGenerator(sessionIdGenerator());
+		return enterpriseCacheSessionDAO;
+	}
+	/**
+	 * 配置用于保存sessionId的cookie
+	 * @return
+	 */
+	@Bean
+	public SimpleCookie sessionIdCookie() {
+		SimpleCookie simpleCookie = new SimpleCookie("sessionId");
+		simpleCookie.setHttpOnly(true);
+		simpleCookie.setPath("/");
+		//设置-1当关闭浏览器时就清楚该sessionId的cookie
+		simpleCookie.setMaxAge(-1);
+		return simpleCookie;
+	}
+	@Bean(name = "sessionManager")
+	public SessionManager sessionManager() {
+		DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+		//设置redis的cachemanager
+		sessionManager.setCacheManager(cacheManager());
+		//sessionManager.setCacheManager(cacheManager);
+		ArrayList<SessionListener> sessionListenerList = new ArrayList<SessionListener>();
+		sessionListenerList.add(shiroSessionListener());
+		sessionManager.setSessionListeners(sessionListenerList);
+		sessionManager.setSessionDAO(sessionDAO());
+		sessionManager.setSessionIdCookie(sessionIdCookie());
+		//设置session的超时时间，单位是毫秒
+		sessionManager.setGlobalSessionTimeout(1800000);
+		//设置URL上面不带有sessionId
+		sessionManager.setSessionIdUrlRewritingEnabled(false);
+		//删除无效的session
+		sessionManager.setDeleteInvalidSessions(true);
+		//设置自动检测过期session
+		sessionManager.setSessionValidationSchedulerEnabled(true);
+		//设置session的有效时间，单位为毫秒，如果用户直接关闭浏览器而不退出登录的话，session就会一直存在，占地方，要设置一个session的有效时间
+		sessionManager.setSessionValidationInterval(3600000);
+		return sessionManager;
+	}
+	/**
+	 * shiro-redis管理器
+	 */
+	@Bean
+	public RedisManager redisManager() {
+		RedisManager redisManager = new RedisManager();
+		redisManager.setHost("192.168.92.121");
+		redisManager.setPort(6379);
+		redisManager.setPassword("123456");
+		return redisManager;
+	}
+	/**
+	 * 缓存管理器使用redis的缓存管理器
+	 */
+	@Bean
+	public RedisCacheManager cacheManager() {
+		RedisCacheManager redisCacheManager = new RedisCacheManager();
+		redisCacheManager.setRedisManager(redisManager());
+		//使用用户名的username作为id
+		redisCacheManager.setPrincipalIdFieldName("username");
+		//设置缓存时间 权限
+		redisCacheManager.setExpire(200000);
+		return redisCacheManager;
+	} 
 }
