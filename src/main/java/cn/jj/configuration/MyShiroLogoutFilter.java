@@ -5,7 +5,7 @@ import javax.servlet.ServletResponse;
 
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authc.LogoutFilter;
-
+//自定义退出过滤器
 public class MyShiroLogoutFilter extends LogoutFilter{
 
 	@Override

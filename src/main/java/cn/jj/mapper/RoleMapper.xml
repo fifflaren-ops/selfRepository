@@ -6,6 +6,8 @@
     <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
     <result column="permission_ids" jdbcType="VARCHAR" property="permissionIds"/>
   </resultMap>
+  
+  <!-- 根据角色ID获取权限 -->
   <select id="getPermissionIdsById" resultType="java.lang.String">
   	select permission_ids
   	from role

@@ -19,7 +19,7 @@ import cn.jj.pojo.Permission;
 import cn.jj.service.MemberService;
 import cn.jj.service.PermissionService;
 import cn.jj.service.RoleService;
-
+//自定义MyRealm
 public class MyRealm extends AuthorizingRealm{
 	
 	@Autowired
@@ -29,7 +29,12 @@ public class MyRealm extends AuthorizingRealm{
 	@Autowired
 	private PermissionService permissionService;
 	/**
-	 * 授权
+	 * 从principals拿出成员
+	 * 通过成员的角色获取其权限ID列表
+	 * 遍历ID列表获取权限对象
+	 * 获取到的权限对象装进一个ArrayList里面
+	 * 新建对象SimpleAuthorizationInfo
+	 * 把上述的ArrayList赋给SimpleAuthorizationInfo
 	 */
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
@@ -50,7 +55,11 @@ public class MyRealm extends AuthorizingRealm{
 		return simpleAuthorizationInfo;
 	}
 	/**
-	 * 认证
+	 * 通过AuthenticationToken获取当前用户在登录页面输入的用户和密码所生成的对象
+	 * 通过UsernamePasswordToken获取用户名
+	 * 调用MemberService的login方法，传入用户名，如果不存在该用户则返回NULL
+	 * 调用MemberService的login方法，传入用户名，如果存在，则把该用户对象，用户密码赋给新建的SimpleAuthenticationInfo
+	 * Shiro会自动验证请求输入的密码和数据库中的密码是否相同
 	 */
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {

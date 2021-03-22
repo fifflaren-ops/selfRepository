@@ -34,8 +34,20 @@ import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 
 import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 
+//自定义shiro配置
 @Configuration
 public class ShiroConfiguration {
+	
+	/*
+	 * 返回一个name为‘shiroFilterFactoryBean’的ShiroFilterFactoryBean对象
+	 * 配给一个SecurityManager，由下面的getSecurityManager所生成
+	 * 配给一个退出过滤器，由下面的getMyShiroLogoutFilter所生成
+	 * 配给一个自定义的过滤器map
+	 * 设置登录的地址
+	 * 设置登录成功后前往的地址
+	 * 设置无权限访问前往的地址
+	 * 设置一系列地址访问所需的权限
+	 */
 	@Bean(name = "shiroFilterFactoryBean")
 	public ShiroFilterFactoryBean getShiroFilterFactoryBean(@Qualifier(value = "defaultSecurityManager")SecurityManager securityManager) {
 		ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
@@ -65,6 +77,8 @@ public class ShiroConfiguration {
 		shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
 		return shiroFilterFactoryBean;
 	}
+	
+	//自定义SecurityManager
 	@Bean(name = "defaultSecurityManager")
 	public SecurityManager getSecurityManager(@Qualifier(value = "myRealm")MyRealm myRealm) {
 		DefaultWebSecurityManager defaultSecurityManager = new DefaultWebSecurityManager();
@@ -78,6 +92,8 @@ public class ShiroConfiguration {
 		defaultSecurityManager.setSessionManager(sessionManager());
 		return defaultSecurityManager;
 	}
+	
+	//自定义MyRealm
 	@Bean(name = "myRealm")
 	public MyRealm  getMyRealm() {
 		MyRealm myRealm = new MyRealm();
@@ -93,6 +109,8 @@ public class ShiroConfiguration {
 	public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
 		return new LifecycleBeanPostProcessor();
 	}
+	
+	//自定义退出登录器
 	public MyShiroLogoutFilter getMyShiroLogoutFilter() {
 		MyShiroLogoutFilter myShiroLogoutFilter = new MyShiroLogoutFilter();
 		myShiroLogoutFilter.setRedirectUrl("tologin");

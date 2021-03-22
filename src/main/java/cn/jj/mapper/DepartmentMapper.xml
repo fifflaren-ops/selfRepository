@@ -6,35 +6,49 @@
     <result column="department_name" jdbcType="VARCHAR" property="departmentName"/>
     <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
   </resultMap>
+  
+  <!-- 获取父级部门列表 -->
   <select id="parentDepartmentsList" resultMap="Department">
   	SELECT id,department_name,parent_id
 	FROM department
 	WHERE parent_id=0 
   </select>
+  
+  <!-- 根据父级部门ID获取下属的部门列表 -->
   <select id="getDepartmentsListByParentId" resultMap="Department">
   	SELECT id,department_name,parent_id
 	FROM department
 	WHERE parent_id=#{parentId} 
   </select>
+  
+  <!-- 根据部门名称检验部门是否存在 -->
   <select id="checkDepartmentByName" resultMap="Department">
   	SELECT id,department_name,parent_id
 	FROM department
 	WHERE department_name=#{departmentName}
   </select>
+  
+  <!-- 根据前端提交的信息封装成部门对象进行添加，如果添加成功则返回1并刷新页面 -->
   <insert id="addDepartment" parameterType="cn.jj.pojo.Department" useGeneratedKeys="true">
   	insert INTO department (department_name,parent_id) 
 	VALUES (#{department.departmentName},#{department.parentId})
   </insert>
+  
+  <!-- 根据部门ID获取部门 -->
   <select id="getDepartmentById" resultMap="Department">
   	SELECT id,department_name,parent_id
 	FROM department
 	WHERE id=#{id}
   </select>
+  
+  <!-- 根据前端提交的信息封装成部门对象进行编辑，如果编辑成功则返回1并刷新页面 -->
   <update id="editDepartment" parameterType="cn.jj.pojo.Department">
   	UPDATE department d
 	SET d.department_name=#{department.departmentName},d.parent_id=#{department.parentId}
 	WHERE d.id = #{department.id}
   </update>
+  
+  <!-- 根据前端提交的部门ID删除部门 -->
   <delete id="delDepartmentById" parameterType="java.lang.Integer">
   	DELETE 
   	FROM department 

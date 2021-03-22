@@ -5,6 +5,7 @@
     <result column="id" jdbcType="INTEGER" property="id"/>
     <result column="duty_name" jdbcType="VARCHAR" property="dutyName"/>
   </resultMap>
+  <!-- 获取职责列表 -->
   <select id="dutiesList" resultMap="Duty">
   	SELECT id,duty_name
 	FROM duties

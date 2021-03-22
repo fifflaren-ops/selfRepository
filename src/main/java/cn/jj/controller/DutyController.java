@@ -15,6 +15,13 @@ import cn.jj.service.DutyService;
 public class DutyController {
 	@Autowired
 	private DutyService dutyService;
+	
+	/*
+	 * 获取职位列表
+	 * 需要‘normal:list’的权限
+	 * 请求方式为post
+	 * 请求地址为localhost:8080/clinic/duty/list
+	 */
 	@PostMapping
 	@RequestMapping("list")
 	@RequiresPermissions("normal:list")

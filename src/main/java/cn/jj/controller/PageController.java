@@ -17,6 +17,7 @@ import cn.jj.service.DepartmentService;
 import cn.jj.service.DutyService;
 import cn.jj.service.MemberService;
 
+//页面控制器
 @Controller
 public class PageController {
 	@Autowired
